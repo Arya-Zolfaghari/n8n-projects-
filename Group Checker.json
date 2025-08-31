@@ -1,0 +1,1171 @@
+{
+  "name": "Group Checker",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4787ca79-c29a-47e1-8956-a59044b4e9fa",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "This message does not contain any key or vital information.",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1872,
+        672
+      ],
+      "id": "c67c4ced-1048-4d53-a8a0-d0fb436ea580",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1pXhFfWeWIpW-hF8hMRtTBQdKn9dW108Rr5Mz0khk37I",
+          "mode": "list",
+          "cachedResultName": "tele groups",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1pXhFfWeWIpW-hF8hMRtTBQdKn9dW108Rr5Mz0khk37I/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1730855704,
+          "mode": "list",
+          "cachedResultName": "messages",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1pXhFfWeWIpW-hF8hMRtTBQdKn9dW108Rr5Mz0khk37I/edit#gid=1730855704"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "User": "={{ $('Telegram Trigger').item.json.message.from.username }}",
+            "Message": "={{ $json.output }}",
+            "Date": "={{ $('Telegram Trigger').item.json.message.date }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "User",
+              "displayName": "User",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        2160,
+        640
+      ],
+      "id": "681edc6e-0685-4ee3-9483-c9a5e013c677",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PmhSknFX7gF6IQNk",
+          "name": "Arya"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.UserID }}",
+        "text": "=hello Mr/Mrs {{ $json.Username }}\nyou are the {{ $json.row_number - 1}} admin from admins list \n\n\nthis is the important message \n{{ $('Telegram Trigger').item.json.message.text }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2832,
+        800
+      ],
+      "id": "0169da13-68c3-4db4-b8db-7159e5036ba3",
+      "name": "Send a text message",
+      "webhookId": "dd368601-7b0d-4d02-a4d5-8e94c7c927db",
+      "credentials": {
+        "telegramApi": {
+          "id": "qNQHHsPqpqjpS5k7",
+          "name": "Arya 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1520,
+        848
+      ],
+      "id": "d15af620-1cdb-483c-8ce2-d84981ed1e4d",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "bHlZTyprE8RSLgU3",
+          "name": "Mohammad ravani"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=the message is :{{ $('Telegram Trigger').item.json.message.text }}",
+        "options": {
+          "systemMessage": "=You are a helpful assistant\n\nPersona: You are an intelligent assistant (a Telegram bot) responsible for managing and disseminating information within an educational or professional group.\nPrimary Task: Your main function is to read all group messages, identify key and vital information, and extract it to inform the members. You must act as a smart filter that only extracts and reports important news.\nKey Information to Extract:\nYou must identify messages related to the following topics with high accuracy and present them in a clear and structured summary:\nClass Status Changes: Such as the cancellation of a session or an in-person class switching to an online format.\nSchedule and Location Changes: Any alterations to the time or venue of the classes.\nFinancial Announcements: Messages concerning tuition payments, fees, and payment deadlines.\nChanges in Content or Personnel: Such as a change of teacher/instructor, or a shift in the group's main topic (e.g., from programming to electronics).\nAssignments and Projects: Announcements regarding new assignments, projects, or their submission deadlines.\nAbsence Notifications: Messages where a member announces they will not be present at an upcoming session.\nImportant Group Decisions: Any other decision, announcement, or critical message that is significant for all group members.\nTone and Output Format:\nYour output should have a formal, clear, and respectful tone. Present the information concisely, accurately, and without extraneous details, so that members can quickly and easily understand the most important updates.\n\n\n\nif its not important message then just return \"This message does not contain any key or vital information.\n\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        1520,
+        672
+      ],
+      "id": "a75365ae-3546-426e-8c3b-f21d99db3817",
+      "name": "AI Agent",
+      "alwaysOutputData": false,
+      "executeOnce": true,
+      "retryOnFail": false,
+      "notesInFlow": false,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d1b559c9-cac5-43f4-bf7b-fb89f9714a81",
+              "leftValue": "={{ $('Telegram Trigger').item.json.message.voice.file_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        48,
+        640
+      ],
+      "id": "1f2cca8d-4891-4475-9b44-e480c903b93c",
+      "name": "text/voice"
+    },
+    {
+      "parameters": {
+        "functionCode": "// This code assumes it's processing the first item from the first input.\n// If you are handling multiple items (e.g., from $input.all()),\n// you'll need to loop through them and apply this logic to each.\n\nconst item = $input.item; // Gets the first item from the default input.\n\n// From your debug output, we know the binary data is under the key 'data'.\nconst binaryPropertyName = 'data';\n\n// Initialize a field in case of errors\nitem.json.base64_conversion_error = null;\nitem.json.base64_audio = null; // Will hold the result\n\nif (item.binary && item.binary[binaryPropertyName]) {\n  try {\n    // Get the binary data as a Buffer.\n    // '0' refers to the first input of the Code node (usually named 'input').\n    // 'binaryPropertyName' is the key of the binary data on that input item.\n    const buffer = await this.helpers.getBinaryDataBuffer(0, binaryPropertyName);\n\n    // Convert buffer to Base64 string\n    item.json.base64_audio = buffer.toString('base64');\n\n  } catch (error) {\n    // Log the error to the n8n execution log for more details\n    this.logger.error(`Error converting binary property '${binaryPropertyName}' to Base64: ${error.message}`, error);\n    // Also add error info to the item's JSON data\n    // ---- THIS IS THE CORRECTED LINE ----\n    item.json.base64_conversion_error = `Failed to convert binary property '${binaryPropertyName}': ${error.message}`;\n    // ------------------------------------\n  }\n} else {\n  const errorMessage = `Binary property '${binaryPropertyName}' not found on input item for Base64 conversion.`;\n  this.logger.warn(errorMessage, item);\n  item.json.base64_conversion_error = errorMessage;\n  if (item.binary) {\n    item.json.available_binary_keys_at_conversion = Object.keys(item.binary);\n  } else {\n    item.json.available_binary_keys_at_conversion = \"item.binary object does not exist\";\n  }\n}\n\nreturn item;"
+      },
+      "name": "Convert to Base",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        960,
+        512
+      ],
+      "id": "0ad91ffa-3b77-4962-8215-958117ee3075"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the input item\nconst item = $input.item;\n\n// Initialize an object to store debug information\nitem.json.binary_debug_info = {\n  has_binary_property: false,\n  available_keys: [],\n  keys_details: {}\n};\n\n// Check if the 'binary' property exists on the item\nif (item.binary && typeof item.binary === 'object' && Object.keys(item.binary).length > 0) {\n  item.json.binary_debug_info.has_binary_property = true;\n  const binaryKeys = Object.keys(item.binary);\n  item.json.binary_debug_info.available_keys = binaryKeys;\n\n  for (const key of binaryKeys) {\n    const binaryProperty = item.binary[key];\n    item.json.binary_debug_info.keys_details[key] = {\n      is_object: typeof binaryProperty === 'object' && binaryProperty !== null,\n      fileName: binaryProperty ? binaryProperty.fileName : 'N/A',\n      mimeType: binaryProperty ? binaryProperty.mimeType : 'N/A',\n      // You can add other properties if you know them, e.g., size, but they aren't always directly on the object\n    };\n  }\n} else {\n  item.json.binary_debug_info.message = \"No 'binary' property found on the input item, or it's empty.\";\n}\n\n// Return the item with the added debug information\nreturn item;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        768,
+        512
+      ],
+      "id": "eaae464e-7326-421f-af12-4058259a89f7",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "url": "https://api.telegram.org/bot7206706490:AAGFBwfPWVh-Z0E9SW9UoJC5v9zY0l9x_4w/getFile",
+        "options": {},
+        "queryParametersUi": {
+          "parameter": [
+            {
+              "name": "file_id",
+              "value": "={{ $('Telegram Trigger').item.json.message.voice.file_id }}"
+            }
+          ]
+        }
+      },
+      "name": "Download Audio2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        320,
+        512
+      ],
+      "id": "ace364f2-f9ad-49a6-aa56-62a71b8c1e1f"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyBUlKkFAxCo89pXZXDg5NXYuh406P0elFc",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"inline_data\": {\n            \"mime_type\": \"audio/oga\",\n            \"data\": \"{{ $json.base64_audio }}\"\n          }\n        }\n      ]\n    }\n  ],\n  \"generationConfig\": {\n    \"temperature\": 0.2,\n    \"response_mime_type\": \"application/json\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1200,
+        512
+      ],
+      "id": "f9f9aaae-dca3-4471-a160-e8493cdc44fd",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.telegram.org/file/bot7206706490:AAGFBwfPWVh-Z0E9SW9UoJC5v9zY0l9x_4w/{{ $json.result.file_path }}",
+        "responseFormat": "file",
+        "options": {}
+      },
+      "name": "Download Audio1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        544,
+        512
+      ],
+      "id": "b96767b7-88ea-4dba-a346-3d528fd0a7b9"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message",
+          "*"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1344,
+        400
+      ],
+      "id": "f7d2228e-6065-407d-838b-1a08096dae21",
+      "name": "Telegram Trigger",
+      "webhookId": "51ea7041-b8ef-4473-b7f2-ff89293b537e",
+      "credentials": {
+        "telegramApi": {
+          "id": "qNQHHsPqpqjpS5k7",
+          "name": "Arya 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "= ({{ $('Telegram Trigger').item.json.message.text }}): => the admin input \n\n\nif the user input is in persion you output should be in persion too\n\nalso if the topic is about saved data's use this structure:\n{\n  \"message\" : \"I did that or XXXXX\",\n  \"date\" : yyyy/mm/dd ,\n  \"chatid\" : the user chat id  ,\n  \"isvalid\" : True/False ,\n  \"output4data\" : the thing that user said to update e.g. this week that class location has been changed to 505 room\n}\n\nelse if the message is not about data put the iscalid and outputmessage4data null , return \"nothing \"",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are an AI assistant for a Telegram bot.\n\nYour responsibilities:\n\n1. Interpret user instructions.\n2. Identify the correct group name and its corresponding chat ID from the following list:\n\nGroup Name → Telegram Chat ID\n- swimming class → -1002596319272  \n- Dance class     → -1002839534860\n- Admin Chat       → {{ $('Telegram Trigger').item.json.message.chat.id }}\n\nYour task:\n\nBased on the user's input ({{ $('Telegram Trigger').item.json.message.text }}):\n\nIf the message contains an instruction to send a message to a group:\n- Extract the correct group name.\n- Return these two fields as key-value pairs:\n  - chat_id: the corresponding Telegram group chat ID (as a plain string) # if admin wants a summery you have to answer in Admin Chat \n  - message: the message to send (as a plain string)\n\nIf the message is a summary request (e.g., \"What happened in the last week in group Dance class\"):\n- Access the message logs stored in Google Sheets (fetched through tools).\n- Analyze the following:\n  - The dates of the messages.\n  - The content of the messages.\n  - The usernames or senders.\n- Filter for the last 7 days only.\n- Generate a brief, readable summary of activity in that group.\n  - Include key topics discussed, user participation, and any highlights or patterns.\n- Return:\n  - chat_id: the group ID based on the mentioned group name.\n  - message: the generated summary as plain text.\n\nExample Outputs:\n\nCase 1: Sending message to a group\n{\n  \"chat_id\": \"-1002596319272\",\n  \"message\": \"Reminder: swimming class starts at 6 AM tomorrow.\"\n}\n\nCase 2: Weekly summary\n{\n  \"chat_id\": \"-1002839534860\",\n  \"message\": \"Summary for Dance class (last 7 days):\\n- 4 members discussed choreography ideas.\\n- Sarah shared 3 video tutorials.\\n- There were 2 reminders about upcoming rehearsals.\"\n}\n\nnow in {{ $now }}\n\n\n\n\nand the output should be like this :\n{\n\t\"message\": \"x\",\n\t\"date\": \"dd/mm/yyyy\",\n  \"chatid\": \"-1000000000000\"\n}\n\nif the user input is in persion you output should be in persion too\n\n\nData Entry for Class Updates:\nThe AI bot will handle updates to the class schedule. If the admin provides new information, such as a change in location, date, or time, the AI must add this data to the designated Google Sheet. The following columns will be filled:\n\nDate: This will be automatically populated with the current timestamp (e.g., {{ $now }}).\n\nMessage: The AI will capture and store the text provided by the admin. For instance, if the admin says \"Do this,\" the AI will store \"this\" under the Message column.\n\nIsValid: This will initially be set to True for new rows. If the admin provides a new update that invalidates previous data (e.g., session changes), the AI should update the old rows’ IsValid column to False and mark the new entry as True.\n\nAppending New Data:\nWhenever the AI appends data to the Google Sheet, the output message will be: \"I did that.\"\n\n\n\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -304,
+        -96
+      ],
+      "id": "8779e380-1047-4ece-9d07-992d19bbaeb2",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e5e7b98b-4aa0-463c-8d76-f7c94869fba6",
+              "leftValue": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+              "rightValue": "={{ $json.UserID }}",
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -864,
+        400
+      ],
+      "id": "1b36cd40-0cf5-44a9-935f-b111afcb1029",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.output.chatid }}",
+        "text": "={{ $json.output.message }}\n\n\nin {{ $json.output.date }}",
+        "additionalFields": {}
+      },
+      "id": "259f515a-cfc6-4c2f-b6ec-6419064398fb",
+      "name": "Send Telegram Message",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        448,
+        48
+      ],
+      "webhookId": "e9773f6c-a563-4471-97cd-714228e5259f",
+      "credentials": {
+        "telegramApi": {
+          "id": "qNQHHsPqpqjpS5k7",
+          "name": "Arya 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        144
+      ],
+      "id": "58fd590e-6e70-44cd-8e13-57ea41c3579a",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "bHlZTyprE8RSLgU3",
+          "name": "Mohammad ravani"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1pXhFfWeWIpW-hF8hMRtTBQdKn9dW108Rr5Mz0khk37I",
+          "mode": "list",
+          "cachedResultName": "tele groups",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1pXhFfWeWIpW-hF8hMRtTBQdKn9dW108Rr5Mz0khk37I/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1730855704,
+          "mode": "list",
+          "cachedResultName": "messages",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1pXhFfWeWIpW-hF8hMRtTBQdKn9dW108Rr5Mz0khk37I/edit#gid=1730855704"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        -240,
+        224
+      ],
+      "id": "cd035f5b-63e6-4af3-b06e-3d610dbb685b",
+      "name": "Get row(s) in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PmhSknFX7gF6IQNk",
+          "name": "Arya"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"message\": \"x\",\n\t\"date\": \"dd/mm/yyyy\",\n  \"chatid\": \"-1000000000000\",\n  \"isvalid\" : \"True/False\",\n  \"outputMessage4data\" : \"XXXX\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        160
+      ],
+      "id": "0f1bd75f-84d6-4d96-a726-ec67104db10a",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1pXhFfWeWIpW-hF8hMRtTBQdKn9dW108Rr5Mz0khk37I",
+          "mode": "list",
+          "cachedResultName": "tele groups",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1pXhFfWeWIpW-hF8hMRtTBQdKn9dW108Rr5Mz0khk37I/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 631112913,
+          "mode": "list",
+          "cachedResultName": "admins",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1pXhFfWeWIpW-hF8hMRtTBQdKn9dW108Rr5Mz0khk37I/edit#gid=631112913"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "=UserID",
+              "lookupValue": "={{ $json.message.from.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -1088,
+        400
+      ],
+      "id": "720bb2a7-2987-4ef6-8fb4-c924927e2efe",
+      "name": "Get row(s) in sheet",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PmhSknFX7gF6IQNk",
+          "name": "Arya"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1pXhFfWeWIpW-hF8hMRtTBQdKn9dW108Rr5Mz0khk37I",
+          "mode": "list",
+          "cachedResultName": "tele groups",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1pXhFfWeWIpW-hF8hMRtTBQdKn9dW108Rr5Mz0khk37I/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 631112913,
+          "mode": "list",
+          "cachedResultName": "admins",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1pXhFfWeWIpW-hF8hMRtTBQdKn9dW108Rr5Mz0khk37I/edit#gid=631112913"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        2384,
+        640
+      ],
+      "id": "da4a59b5-35f6-437d-af4d-70e19149c5a6",
+      "name": "Get row(s) in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PmhSknFX7gF6IQNk",
+          "name": "Arya"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2608,
+        640
+      ],
+      "id": "f44d47b1-42b9-46b7-ae0c-129bad4d4e6f",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "dcd4f272-5882-43e7-8588-4ec380d9b40f",
+              "leftValue": "={{ $json.output.isvalid }}",
+              "rightValue": "True",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "44f552ee-5d96-45da-8921-dc6d1431f79d",
+              "leftValue": "={{ $json.output.isvalid }}",
+              "rightValue": "False",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        64,
+        -96
+      ],
+      "id": "78f9bf07-29e3-4f30-bca6-70f16be7a57d",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1pXhFfWeWIpW-hF8hMRtTBQdKn9dW108Rr5Mz0khk37I",
+          "mode": "list",
+          "cachedResultName": "tele groups",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1pXhFfWeWIpW-hF8hMRtTBQdKn9dW108Rr5Mz0khk37I/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2016872233,
+          "mode": "list",
+          "cachedResultName": "data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1pXhFfWeWIpW-hF8hMRtTBQdKn9dW108Rr5Mz0khk37I/edit#gid=2016872233"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date ": "={{ $json.output.date }}",
+            "message ": "={{ $json.output.outputMessage4data }}",
+            "isvalid ": "={{ $json.output.isvalid }}"
+          },
+          "matchingColumns": [
+            "message "
+          ],
+          "schema": [
+            {
+              "id": "Date ",
+              "displayName": "Date ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "message ",
+              "displayName": "message ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "isvalid ",
+              "displayName": "isvalid ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        384,
+        -288
+      ],
+      "id": "4e123e53-8cc8-4eb4-8239-53eff3fb3b60",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PmhSknFX7gF6IQNk",
+          "name": "Arya"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('If2').item.json.output.chatid }}",
+        "text": "={{ $('If2').item.json.output.message }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        720,
+        -288
+      ],
+      "id": "c2d1f197-a9ee-42b5-9a6b-4a0f61dcb381",
+      "name": "Send a text message1",
+      "webhookId": "1dcbbaef-affa-4eb4-b803-57ed2a0a483e",
+      "credentials": {
+        "telegramApi": {
+          "id": "qNQHHsPqpqjpS5k7",
+          "name": "Arya 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=the user message :{{ $('Telegram Trigger').item.json.message.text }}\n",
+        "options": {
+          "systemMessage": "\nIf the message is a question, search the data sheet for a matching answer.\n\nIf an answer is found, return the corresponding message.\n\nIf no relevant data is found, respond with: \"nothing\".\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        2080,
+        1024
+      ],
+      "id": "1a5cdb94-9aec-46c9-ace0-8e2676c9d179",
+      "name": "AI Agent2"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        2048,
+        1328
+      ],
+      "id": "2e000677-ec1e-407b-b36a-9e0eb587f360",
+      "name": "Google Gemini Chat Model2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "mtWCddFJlqhCnjDs",
+          "name": "Arya 1"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2768,
+        1152
+      ],
+      "id": "9414615b-4cb6-4e19-9406-fda1a56b967d",
+      "name": "Send a text message2",
+      "webhookId": "24e3bf90-a56a-44ea-b13a-9c548a317762",
+      "credentials": {
+        "telegramApi": {
+          "id": "qNQHHsPqpqjpS5k7",
+          "name": "Arya 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f955b4ed-9c33-401b-b4ef-9e675af55145",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "nothing",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2480,
+        1200
+      ],
+      "id": "1a7f4f25-440c-4a43-9cb3-aa202761fed7",
+      "name": "If3"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2768,
+        1504
+      ],
+      "id": "ae519403-9b06-47e2-830e-4f82ed8fe21e",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1pXhFfWeWIpW-hF8hMRtTBQdKn9dW108Rr5Mz0khk37I",
+          "mode": "list",
+          "cachedResultName": "tele groups",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1pXhFfWeWIpW-hF8hMRtTBQdKn9dW108Rr5Mz0khk37I/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2016872233,
+          "mode": "list",
+          "cachedResultName": "data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1pXhFfWeWIpW-hF8hMRtTBQdKn9dW108Rr5Mz0khk37I/edit#gid=2016872233"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "isvalid ",
+              "lookupValue": "True"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        2304,
+        1312
+      ],
+      "id": "a929b8fd-5e78-4a10-b8e1-bb41ae150eb8",
+      "name": "Get rows",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PmhSknFX7gF6IQNk",
+          "name": "Arya"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "text/voice": {
+      "main": [
+        [
+          {
+            "node": "Download Audio2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to Base": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Convert to Base",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Audio2": {
+      "main": [
+        [
+          {
+            "node": "Download Audio1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Audio1": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "text/voice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Telegram Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent2": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "Send a text message2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get rows": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "75d39b46-e764-426b-ae41-f7e1d63e31c3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fcd4667358b944199263e425bf5854ca490d4dd43ed166e6d276f3c66e35f29f"
+  },
+  "id": "ofV5qzdAMfMagMcJ",
+  "tags": []
+}
