@@ -1,0 +1,1049 @@
+{
+  "name": "Email Marketing",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 10
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        64,
+        400
+      ],
+      "id": "7b1b474d-bf27-42c3-b850-9c18d57094ba",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1p5RMVufC2Bp5HgERUNRzsU9I_VbX99JSHupmkWxUV9I",
+          "mode": "list",
+          "cachedResultName": "Email-Marketing - Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1p5RMVufC2Bp5HgERUNRzsU9I_VbX99JSHupmkWxUV9I/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 366548498,
+          "mode": "list",
+          "cachedResultName": "Email-Marketing - Sheet1.csv",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1p5RMVufC2Bp5HgERUNRzsU9I_VbX99JSHupmkWxUV9I/edit#gid=366548498"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "step 1",
+              "lookupValue": "open"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        224,
+        112
+      ],
+      "id": "c526e371-829f-44d2-a642-aedfb9b43ffd",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PmhSknFX7gF6IQNk",
+          "name": "Arya"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# sending new email",
+        "height": 600,
+        "width": 1180
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "1e80e5f0-eb08-489b-a324-6e78cefa637a",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "=پیشنهاد ویژه",
+        "message": "= {{ $json.name }} سلام اقا/خانم \n\nما یک پیشنهاد ویژه واسه شما داریم\nبرای اطلاعات بیشتر پیام دهید",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        960,
+        128
+      ],
+      "id": "05aca25b-149c-4d68-9af8-62a237c93e62",
+      "name": "Send a message",
+      "webhookId": "6ee81a97-21b6-404f-b771-7df15c59dd2d",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "tjJh4M0tBGsWdScr",
+          "name": "Arya"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Reminder",
+        "height": 600,
+        "width": 1220,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -208,
+        1168
+      ],
+      "typeVersion": 1,
+      "id": "18e7782f-9f3b-4667-ac6c-7aca988ee099",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "# saving clients replies\n",
+        "height": 460,
+        "width": 1460,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2032,
+        608
+      ],
+      "typeVersion": 1,
+      "id": "d3723ac1-f01f-43dd-bbda-4bdab62e8487",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        432,
+        112
+      ],
+      "id": "1d2f690e-847c-482e-8911-d6e1c2daaf80",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "amount": "={{ Math.random(); }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        512,
+        352
+      ],
+      "id": "e013aee9-02df-4fb2-9066-d02f728749f5",
+      "name": "Wait",
+      "webhookId": "7aaed4de-5e96-4cb8-9ef4-0b48ba1a3aa2"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1p5RMVufC2Bp5HgERUNRzsU9I_VbX99JSHupmkWxUV9I",
+          "mode": "list",
+          "cachedResultName": "Email-Marketing - Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1p5RMVufC2Bp5HgERUNRzsU9I_VbX99JSHupmkWxUV9I/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 366548498,
+          "mode": "list",
+          "cachedResultName": "Email-Marketing - Sheet1.csv",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1p5RMVufC2Bp5HgERUNRzsU9I_VbX99JSHupmkWxUV9I/edit#gid=366548498"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "email": "={{ $('Get row(s) in sheet').item.json.email }}",
+            "time sent": "={{ new Date().toISOString() }}",
+            "step 1": "close"
+          },
+          "matchingColumns": [
+            "email"
+          ],
+          "schema": [
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "step 1",
+              "displayName": "step 1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "time sent",
+              "displayName": "time sent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "step2",
+              "displayName": "step2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "user_message",
+              "displayName": "user_message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        752,
+        384
+      ],
+      "id": "a0d6d662-b64a-4e4c-a27d-76c6f791fc53",
+      "name": "step 1 > close",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PmhSknFX7gF6IQNk",
+          "name": "Arya"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 10
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -144,
+        1360
+      ],
+      "id": "7ffe9c5f-b1d6-4ec5-ba6c-1b5814075b54",
+      "name": "Schedule Trigger1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1p5RMVufC2Bp5HgERUNRzsU9I_VbX99JSHupmkWxUV9I",
+          "mode": "list",
+          "cachedResultName": "Email-Marketing",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1p5RMVufC2Bp5HgERUNRzsU9I_VbX99JSHupmkWxUV9I/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 366548498,
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1p5RMVufC2Bp5HgERUNRzsU9I_VbX99JSHupmkWxUV9I/edit#gid=366548498"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "step 1",
+              "lookupValue": "close"
+            },
+            {
+              "lookupColumn": "step2",
+              "lookupValue": "open"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        48,
+        1200
+      ],
+      "id": "b064a714-f2f1-4cea-8645-10db27ca907d",
+      "name": "Get row(s) in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PmhSknFX7gF6IQNk",
+          "name": "Arya"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        320,
+        1200
+      ],
+      "id": "b139ff03-61d9-409f-903b-b5eaa229326b",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "پیرو پیام قبلی",
+        "message": "= {{ $json.name }} سلام اقا/خانم \n\nپیام بنده رو دریافت کردید",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        544,
+        1264
+      ],
+      "id": "fb780133-d2f9-4b99-87ec-9efbf51bfbbb",
+      "name": "Send a message1",
+      "webhookId": "3f802a06-33bd-4ec3-ad03-199577d912fd",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "tjJh4M0tBGsWdScr",
+          "name": "Arya"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1521c881-4b12-4527-a6f0-d3d439c020a4",
+              "leftValue": "={{ \n  (new Date().getTime() - new Date($json[\"time sent\"]).getTime()) >= 24 * 60 * 60 * 1000 \n}}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        64,
+        1472
+      ],
+      "id": "ce641373-2e3e-4805-afa7-a6db7268dade",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1p5RMVufC2Bp5HgERUNRzsU9I_VbX99JSHupmkWxUV9I",
+          "mode": "list",
+          "cachedResultName": "Email-Marketing",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1p5RMVufC2Bp5HgERUNRzsU9I_VbX99JSHupmkWxUV9I/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 366548498,
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1p5RMVufC2Bp5HgERUNRzsU9I_VbX99JSHupmkWxUV9I/edit#gid=366548498"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "email": "={{ $('Get row(s) in sheet1').item.json.email }}",
+            "step2": "close"
+          },
+          "matchingColumns": [
+            "email"
+          ],
+          "schema": [
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "step 1",
+              "displayName": "step 1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "time sent",
+              "displayName": "time sent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "step2",
+              "displayName": "step2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "user_message",
+              "displayName": "user_message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        800,
+        1360
+      ],
+      "id": "2e6169c3-52d0-41ca-9014-d11247d309df",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PmhSknFX7gF6IQNk",
+          "name": "Arya"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "93decd93-4237-46d2-bdda-47b19d80d441",
+              "leftValue": "={{ $('Get row(s) in sheet2').item.json.isEmpty() }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2528,
+        704
+      ],
+      "id": "a73aaba6-5374-4222-b237-42d83e3b3f1e",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1p5RMVufC2Bp5HgERUNRzsU9I_VbX99JSHupmkWxUV9I",
+          "mode": "list",
+          "cachedResultName": "Email-Marketing",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1p5RMVufC2Bp5HgERUNRzsU9I_VbX99JSHupmkWxUV9I/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 366548498,
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1p5RMVufC2Bp5HgERUNRzsU9I_VbX99JSHupmkWxUV9I/edit#gid=366548498"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "email",
+              "lookupValue": "={{ $('Gmail Trigger').item.json.from.value[0].address }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        2288,
+        800
+      ],
+      "id": "43f6ed7c-c344-4654-8016-63f87f321906",
+      "name": "Get row(s) in sheet2",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PmhSknFX7gF6IQNk",
+          "name": "Arya"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1p5RMVufC2Bp5HgERUNRzsU9I_VbX99JSHupmkWxUV9I",
+          "mode": "list",
+          "cachedResultName": "Email-Marketing",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1p5RMVufC2Bp5HgERUNRzsU9I_VbX99JSHupmkWxUV9I/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 366548498,
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1p5RMVufC2Bp5HgERUNRzsU9I_VbX99JSHupmkWxUV9I/edit#gid=366548498"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "email": "={{ $('Gmail Trigger').item.json.from.value[0].address }}",
+            "step 1": "close",
+            "step2": "close",
+            "user_message": "={{ $json.text }}"
+          },
+          "matchingColumns": [
+            "email"
+          ],
+          "schema": [
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "step 1",
+              "displayName": "step 1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "time sent",
+              "displayName": "time sent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "step2",
+              "displayName": "step2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "user_message",
+              "displayName": "user_message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        3248,
+        688
+      ],
+      "id": "3fef4b93-16be-4699-860b-2d70d36b8961",
+      "name": "Append or update row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PmhSknFX7gF6IQNk",
+          "name": "Arya"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "21aacfbf-777a-4e83-8612-864edb25bab0",
+              "leftValue": "={{ $json.user_message.isEmpty() }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2704,
+        848
+      ],
+      "id": "41b515b9-06e8-49e6-ac8b-7aad5617cac7",
+      "name": "If2"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        3184,
+        944
+      ],
+      "id": "38b13369-4a2b-4e1c-8b16-66aa4435397d",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "dataPropertyName": "=data",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "text",
+              "cssSelector": "p"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        3088,
+        688
+      ],
+      "id": "0c33bc8b-d33a-47a3-bd80-edfa1b6ce837",
+      "name": "HTML"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d6c62423-a5f2-440d-a68d-9c9bf59ed54a",
+              "name": "data",
+              "value": "={{ $('Gmail Trigger').item.json.textAsHtml }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2928,
+        752
+      ],
+      "id": "a849b083-ad93-49ef-bd5b-95ba71ac56b1",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        2080,
+        800
+      ],
+      "id": "7f382dfd-d271-4b5a-b77e-a8f6f158ea1d",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "tjJh4M0tBGsWdScr",
+          "name": "Arya"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        400,
+        1632
+      ],
+      "id": "e9a78fad-54dd-4e3c-be76-a3524a0728c5",
+      "name": "No Operation, do nothing1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "step 1 > close",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "step 1 > close": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message1": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet2": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "98fd498a-738f-4287-b3e6-58313d8ea71d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fcd4667358b944199263e425bf5854ca490d4dd43ed166e6d276f3c66e35f29f"
+  },
+  "id": "UdJS3cHylV9BAR5K",
+  "tags": []
+}
