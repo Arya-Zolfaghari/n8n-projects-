@@ -1,0 +1,561 @@
+{
+  "name": "Calendar",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1264,
+        432
+      ],
+      "id": "13f0f0b6-ce36-4ab1-a81c-6cc4bdb8faff",
+      "name": "Telegram Trigger",
+      "webhookId": "99850f04-2d2f-4f7c-a675-58533dda97e3",
+      "credentials": {
+        "telegramApi": {
+          "id": "mAC2R0wyewh0qIhn",
+          "name": "Arya calendar"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Telegram Trigger').item.json.message.voice.file_id }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "130c168e-9664-48d8-b7f9-a1f33fead205"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "audio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b4edf9ff-d948-40fb-86bb-7c4571801498",
+                    "leftValue": "={{ $('Telegram Trigger').item.json.message.voice.file_id }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notExists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -768,
+        432
+      ],
+      "id": "dd83e0c3-325a-4e4d-bac1-f6a35f75b560",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $('Telegram Trigger').item.json.message.voice.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -544,
+        304
+      ],
+      "id": "e60f0ead-28d2-427b-84cd-44b53f05b328",
+      "name": "Telegram",
+      "webhookId": "bc24e18e-2a3d-43fc-a4b2-e19503fb2199",
+      "credentials": {
+        "telegramApi": {
+          "id": "mAC2R0wyewh0qIhn",
+          "name": "Arya calendar"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.message.chat.id }}",
+        "text": "بزار ببینم ..",
+        "additionalFields": {
+          "appendAttribution": false,
+          "reply_to_message_id": "={{ $json.message.message_id }}"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -960,
+        432
+      ],
+      "id": "37d3975c-3965-46ee-ba52-7260e54f76f9",
+      "name": "Telegram1",
+      "webhookId": "58ea844b-3011-49e8-9e06-ef156a15103c",
+      "credentials": {
+        "telegramApi": {
+          "id": "mAC2R0wyewh0qIhn",
+          "name": "Arya calendar"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.candidates[0].content.parts[0].text }}{{ $('Telegram Trigger').item.json.message.text }}",
+        "options": {
+          "systemMessage": "=شما یک دستیار هوش مصنوعی هستید که از طریق تلگرام با کاربر ارتباط برقرار می‌کند و وظیفهٔ کامل مدیریت تقویم (خواندن، ایجاد، حذف و به‌روزرسانی رویدادها) را بر عهده دارید. ابزارهای در دسترس شما عبارت‌اند از:\n- **read**: خواندن رویدادهای تقویم در یک بازهٔ زمانی مشخص  \n- **create**: ایجاد یک رویداد جدید در تقویم  \n- **delete**: حذف یک رویداد موجود بر اساس شناسهٔ مشخص  \n\ntoday is {{ $now.toDateTime().setZone('Asia/Tehran').toFormat('yyyy-MM-dd HH:mm:ss') }} \n\n\n\nbe careful about today and tomorow,if it is after midnight we are already in today\n\nif user asks for deletinging multiple events, do it one by one by evenid you take via read tool\n\nuse informal way of tralking in chat.\nyou cant set multiple task for the same time, ask to change if sb says i wanna set a task at 9pm while they already have a task at that time"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        592,
+        432
+      ],
+      "id": "20f93abb-46ea-4a07-b560-e8d412515b40",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1120,
+        432
+      ],
+      "id": "813acdac-13a1-4fa4-b130-0ec124d42589",
+      "name": "Telegram2",
+      "webhookId": "bae57f62-0feb-47f7-95cd-8a600763475c",
+      "credentials": {
+        "telegramApi": {
+          "id": "PEHY2660rCTrRnRe",
+          "name": "Arya calendar 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "خواندن رویدادهای تقویم کاربر در یک بازهٔ زمانی مشخص",
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "a.zolfaghari1208@gmail.com",
+          "mode": "list",
+          "cachedResultName": "a.zolfaghari1208@gmail.com"
+        },
+        "limit": 10,
+        "timeMin": "={{ $fromAI('After', ``, 'string') }}",
+        "timeMax": "={{ $fromAI('Before', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        1072,
+        800
+      ],
+      "id": "2904b15f-b994-48b5-848f-a1e779c7d59d",
+      "name": "read",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "2VnqaETWW5JE1xzj",
+          "name": "Arya"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "ایجاد یک رویداد جدید در تقویم کار",
+        "calendar": {
+          "__rl": true,
+          "value": "a.zolfaghari1208@gmail.com",
+          "mode": "list",
+          "cachedResultName": "a.zolfaghari1208@gmail.com"
+        },
+        "start": "={{ $fromAI('Start', ``, 'string') }}",
+        "end": "={{ $fromAI('End', ``, 'string') }}",
+        "useDefaultReminders": false,
+        "additionalFields": {
+          "attendees": [],
+          "description": "={{ $fromAI('Description', ``, 'string') }}",
+          "summary": "={{ $fromAI('Summary', ``, 'string') }}"
+        },
+        "remindersUi": {
+          "remindersValues": [
+            {
+              "method": "email",
+              "minutes": 30
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        880,
+        800
+      ],
+      "id": "13856025-18fa-4c9e-a0a4-094acbef7aa9",
+      "name": "create",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "2VnqaETWW5JE1xzj",
+          "name": "Arya"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "حذف کردن",
+        "operation": "delete",
+        "calendar": {
+          "__rl": true,
+          "value": "a.zolfaghari1208@gmail.com",
+          "mode": "list",
+          "cachedResultName": "a.zolfaghari1208@gmail.com"
+        },
+        "eventId": "={{ $fromAI('Event_ID', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        768,
+        800
+      ],
+      "id": "e47e2bd0-dbe3-4b5f-a2b0-939d347a584f",
+      "name": "delete",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "2VnqaETWW5JE1xzj",
+          "name": "Arya"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.telegram.org/file/bot7528059413:AAGsTUKa9hVH6lUsc0lc6GxSndbMsPe2hQI/{{ $json.result.file_path }}",
+        "responseFormat": "file",
+        "options": {}
+      },
+      "name": "Download Audio1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        304
+      ],
+      "id": "7acd0d69-6216-4e8b-9739-5a45c79b3a06"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyBUlKkFAxCo89pXZXDg5NXYuh406P0elFc",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"inline_data\": {\n            \"mime_type\": \"audio/oga\",\n            \"data\": \"{{ $json.base64_audio }}\"\n          }\n        }\n      ]\n    }\n  ],\n  \"generationConfig\": {\n    \"temperature\": 0.2,\n    \"response_mime_type\": \"application/json\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        320,
+        304
+      ],
+      "id": "5ec62761-b048-4009-b636-aa967b1bad33",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the input item\nconst item = $input.item;\n\n// Initialize an object to store debug information\nitem.json.binary_debug_info = {\n  has_binary_property: false,\n  available_keys: [],\n  keys_details: {}\n};\n\n// Check if the 'binary' property exists on the item\nif (item.binary && typeof item.binary === 'object' && Object.keys(item.binary).length > 0) {\n  item.json.binary_debug_info.has_binary_property = true;\n  const binaryKeys = Object.keys(item.binary);\n  item.json.binary_debug_info.available_keys = binaryKeys;\n\n  for (const key of binaryKeys) {\n    const binaryProperty = item.binary[key];\n    item.json.binary_debug_info.keys_details[key] = {\n      is_object: typeof binaryProperty === 'object' && binaryProperty !== null,\n      fileName: binaryProperty ? binaryProperty.fileName : 'N/A',\n      mimeType: binaryProperty ? binaryProperty.mimeType : 'N/A',\n      // You can add other properties if you know them, e.g., size, but they aren't always directly on the object\n    };\n  }\n} else {\n  item.json.binary_debug_info.message = \"No 'binary' property found on the input item, or it's empty.\";\n}\n\n// Return the item with the added debug information\nreturn item;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -16,
+        304
+      ],
+      "id": "5bd33a3a-dcda-4caa-8f28-8df716f36fe7",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "functionCode": "// This code assumes it's processing the first item from the first input.\n// If you are handling multiple items (e.g., from $input.all()),\n// you'll need to loop through them and apply this logic to each.\n\nconst item = $input.item; // Gets the first item from the default input.\n\n// From your debug output, we know the binary data is under the key 'data'.\nconst binaryPropertyName = 'data';\n\n// Initialize a field in case of errors\nitem.json.base64_conversion_error = null;\nitem.json.base64_audio = null; // Will hold the result\n\nif (item.binary && item.binary[binaryPropertyName]) {\n  try {\n    // Get the binary data as a Buffer.\n    // '0' refers to the first input of the Code node (usually named 'input').\n    // 'binaryPropertyName' is the key of the binary data on that input item.\n    const buffer = await this.helpers.getBinaryDataBuffer(0, binaryPropertyName);\n\n    // Convert buffer to Base64 string\n    item.json.base64_audio = buffer.toString('base64');\n\n  } catch (error) {\n    // Log the error to the n8n execution log for more details\n    this.logger.error(`Error converting binary property '${binaryPropertyName}' to Base64: ${error.message}`, error);\n    // Also add error info to the item's JSON data\n    // ---- THIS IS THE CORRECTED LINE ----\n    item.json.base64_conversion_error = `Failed to convert binary property '${binaryPropertyName}': ${error.message}`;\n    // ------------------------------------\n  }\n} else {\n  const errorMessage = `Binary property '${binaryPropertyName}' not found on input item for Base64 conversion.`;\n  this.logger.warn(errorMessage, item);\n  item.json.base64_conversion_error = errorMessage;\n  if (item.binary) {\n    item.json.available_binary_keys_at_conversion = Object.keys(item.binary);\n  } else {\n    item.json.available_binary_keys_at_conversion = \"item.binary object does not exist\";\n  }\n}\n\nreturn item;"
+      },
+      "name": "Convert to Base",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        144,
+        304
+      ],
+      "id": "f699e089-d1b5-4903-8205-2bd095605416"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        592,
+        768
+      ],
+      "id": "6abdb4d2-3786-45c1-85fd-5b804917cd18",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "mtWCddFJlqhCnjDs",
+          "name": "Arya 1"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.telegram.org/bot7528059413:AAGsTUKa9hVH6lUsc0lc6GxSndbMsPe2hQI/getFile",
+        "options": {},
+        "queryParametersUi": {
+          "parameter": [
+            {
+              "name": "file_id",
+              "value": "={{ $json.result.file_id }}"
+            }
+          ]
+        }
+      },
+      "name": "Download Audio2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        -336,
+        304
+      ],
+      "id": "bc38c53e-bc87-4f87-b295-fbd9be3edb87"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Telegram1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram": {
+      "main": [
+        [
+          {
+            "node": "Download Audio2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram1": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Telegram2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "read": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "create": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "delete": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Audio1": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Convert to Base",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to Base": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Audio2": {
+      "main": [
+        [
+          {
+            "node": "Download Audio1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5c2177c2-e129-4483-b04e-8cf77b6787cf",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fcd4667358b944199263e425bf5854ca490d4dd43ed166e6d276f3c66e35f29f"
+  },
+  "id": "C0iyZSWP8VGmUB1x",
+  "tags": []
+}
