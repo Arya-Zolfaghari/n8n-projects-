@@ -283,7 +283,7 @@
     },
     {
       "parameters": {
-        "url": "=https://api.telegram.org/file/bot7528059413:AAGsTUKa9hVH6lUsc0lc6GxSndbMsPe2hQI/{{ $json.result.file_path }}",
+        "url": "=https://api.telegram.org/file/bot./{{ $json.result.file_path }}",
         "responseFormat": "file",
         "options": {}
       },
@@ -299,7 +299,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyBUlKkFAxCo89pXZXDg5NXYuh406P0elFc",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key.",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"inline_data\": {\n            \"mime_type\": \"audio/oga\",\n            \"data\": \"{{ $json.base64_audio }}\"\n          }\n        }\n      ]\n    }\n  ],\n  \"generationConfig\": {\n    \"temperature\": 0.2,\n    \"response_mime_type\": \"application/json\"\n  }\n}",
@@ -355,14 +355,14 @@
       "name": "Google Gemini Chat Model",
       "credentials": {
         "googlePalmApi": {
-          "id": "mtWCddFJlqhCnjDs",
+          "id": ".",
           "name": "Arya 1"
         }
       }
     },
     {
       "parameters": {
-        "url": "=https://api.telegram.org/bot7528059413:AAGsTUKa9hVH6lUsc0lc6GxSndbMsPe2hQI/getFile",
+        "url": "=https://api.telegram.org/bot/getFile",
         "options": {},
         "queryParametersUi": {
           "parameter": [
