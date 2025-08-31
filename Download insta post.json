@@ -1,0 +1,928 @@
+{
+  "name": "Download insta post",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "={{ $('Telegram Trigger').item.json.message.text }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"
+            },
+            {
+              "name": "accept-language",
+              "value": "en-GB,en;q=0.9"
+            },
+            {
+              "name": "cache-control",
+              "value": "no-cache"
+            },
+            {
+              "name": "dpr",
+              "value": "1"
+            },
+            {
+              "name": "pragma",
+              "value": "no-cache"
+            },
+            {
+              "name": "priority",
+              "value": "u=0, i"
+            },
+            {
+              "name": "referer",
+              "value": "https://www.google.com/"
+            },
+            {
+              "name": "sec-ch-prefers-color-scheme",
+              "value": "dark"
+            },
+            {
+              "name": "sec-ch-ua",
+              "value": "\"Not)A;Brand\";v=\"8\", \"Chromium\";v=\"138\", \"Google Chrome\";v=\"138\""
+            },
+            {
+              "name": "sec-ch-ua-full-version-list",
+              "value": "\"Not)A;Brand\";v=\"8.0.0.0\", \"Chromium\";v=\"138.0.7204.96\", \"Google Chrome\";v=\"138.0.7204.96\""
+            },
+            {
+              "name": "sec-ch-ua-mobile",
+              "value": "?0"
+            },
+            {
+              "name": "sec-ch-ua-model",
+              "value": "\"\""
+            },
+            {
+              "name": "sec-ch-ua-platform",
+              "value": "\"Windows\""
+            },
+            {
+              "name": "sec-ch-ua-platform-version",
+              "value": "\"10.0.0\""
+            },
+            {
+              "name": "sec-fetch-dest",
+              "value": "document"
+            },
+            {
+              "name": "sec-fetch-mode",
+              "value": "navigate"
+            },
+            {
+              "name": "sec-fetch-site",
+              "value": "same-origin"
+            },
+            {
+              "name": "sec-fetch-user",
+              "value": "?1"
+            },
+            {
+              "name": "upgrade-insecure-requests",
+              "value": "1"
+            },
+            {
+              "name": "user-agent",
+              "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+            },
+            {
+              "name": "viewport-width",
+              "value": "814"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        112,
+        480
+      ],
+      "id": "283f9ef5-4e66-4ea0-a774-0f6c524c03d4",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "scripts",
+              "cssSelector": "script[type=\"application/json\"]",
+              "returnValue": "html",
+              "returnArray": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        288,
+        80
+      ],
+      "id": "15417b99-01ec-491f-bb2f-f04442f0a53f",
+      "name": "HTML"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "scripts",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        512,
+        80
+      ],
+      "id": "de33fa20-916b-45bb-a9fb-9c3d201f40ce",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        384,
+        320
+      ],
+      "id": "8a27bc25-0b25-4a95-987b-8bda4838c5b1",
+      "name": "Loop Over Items",
+      "executeOnce": false,
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a5a37d90-a3e3-4b1c-8a41-a8d559c4c9b6",
+              "leftValue": "={{ $json.scripts }}",
+              "rightValue": "={{ $('Telegram Trigger').item.json.message.text.split(\"/\")[4] }}",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        560,
+        384
+      ],
+      "id": "93f7c99c-6642-4e5d-9d5a-61ce95060818",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw     = $input.first().json.scripts;\nconst scripts = typeof raw === 'string' ? JSON.parse(raw) : raw;\nconst url =\n  scripts?.require?.[0]?.[3]?.[0]?.__bbox?.require?.[0]?.[3]?.[1]\n         ?.__bbox?.result?.data\n         ?.xdt_api__v1__media__shortcode__web_info?.items?.[0]\n         ?.video_versions?.[0]?.url ?? null;\n\nreturn [\n  {\n    json: { url }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        768,
+        368
+      ],
+      "id": "1bb7a019-5401-4ec3-95fd-b6e45b2b7ee4",
+      "name": "Code",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1072,
+        528
+      ],
+      "id": "7c2fcb83-fbd8-4b28-8ae2-e82d2288053f",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0e2f2f92-002a-4a01-9ad9-e6020674e315",
+              "leftValue": "={{ $json.url }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        880,
+        480
+      ],
+      "id": "36ba7a1c-9c2f-4418-b21e-7c28d347fc7b",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "operation": "sendVideo",
+        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "binaryData": true,
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1312,
+        528
+      ],
+      "id": "7e5ef888-8740-4b1d-be36-f40492494edb",
+      "name": "Send a video",
+      "webhookId": "ee4fb4cf-c03d-44d4-adac-278674a6c941",
+      "executeOnce": true,
+      "credentials": {
+        "telegramApi": {
+          "id": "Y74ZZSS8o89BKZA4",
+          "name": "Arya 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -448,
+        624
+      ],
+      "id": "d3a0348e-286c-4e98-b05c-eb5b33c7fa16",
+      "name": "Telegram Trigger",
+      "webhookId": "63633313-fb40-45d6-82e8-d7d793c67cf9",
+      "credentials": {
+        "telegramApi": {
+          "id": "Y74ZZSS8o89BKZA4",
+          "name": "Arya 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "44054cdf-7d10-4624-a0f0-d38a207fb54f",
+              "leftValue": "={{ $('Telegram Trigger').item.json.message.text }}",
+              "rightValue": "https",
+              "operator": {
+                "type": "string",
+                "operation": "startsWith"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -288,
+        624
+      ],
+      "id": "1728b087-dbdf-4f45-87d1-4d5b94a47f98",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "text": "send me a valid reel url",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -80,
+        704
+      ],
+      "id": "3a963152-d1f2-4f5f-ace5-afcb8496af39",
+      "name": "Send a text message",
+      "webhookId": "ff041f27-6f1d-454f-877d-845868adffc5",
+      "credentials": {
+        "telegramApi": {
+          "id": "Y74ZZSS8o89BKZA4",
+          "name": "Arya 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.message.from.id }}",
+        "text": "wait....",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -80,
+        528
+      ],
+      "id": "2b98ae18-41df-4d7b-a3c0-c5bdebf05fb3",
+      "name": "Send a text message1",
+      "webhookId": "a762064a-5ac6-4526-9572-fd94e10afea9",
+      "credentials": {
+        "telegramApi": {
+          "id": "Y74ZZSS8o89BKZA4",
+          "name": "Arya 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Telegram Trigger').item.json.message.text }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"
+            },
+            {
+              "name": "accept-language",
+              "value": "en-GB,en;q=0.9"
+            },
+            {
+              "name": "cache-control",
+              "value": "no-cache"
+            },
+            {
+              "name": "dpr",
+              "value": "1"
+            },
+            {
+              "name": "pragma",
+              "value": "no-cache"
+            },
+            {
+              "name": "priority",
+              "value": "u=0, i"
+            },
+            {
+              "name": "referer",
+              "value": "https://www.google.com/"
+            },
+            {
+              "name": "sec-ch-prefers-color-scheme",
+              "value": "dark"
+            },
+            {
+              "name": "sec-ch-ua",
+              "value": "\"Not)A;Brand\";v=\"8\", \"Chromium\";v=\"138\", \"Google Chrome\";v=\"138\""
+            },
+            {
+              "name": "sec-ch-ua-full-version-list",
+              "value": "\"Not)A;Brand\";v=\"8.0.0.0\", \"Chromium\";v=\"138.0.7204.96\", \"Google Chrome\";v=\"138.0.7204.96\""
+            },
+            {
+              "name": "sec-ch-ua-mobile",
+              "value": "?0"
+            },
+            {
+              "name": "sec-ch-ua-model",
+              "value": "\"\""
+            },
+            {
+              "name": "sec-ch-ua-platform",
+              "value": "\"Windows\""
+            },
+            {
+              "name": "sec-ch-ua-platform-version",
+              "value": "\"10.0.0\""
+            },
+            {
+              "name": "sec-fetch-dest",
+              "value": "document"
+            },
+            {
+              "name": "sec-fetch-mode",
+              "value": "navigate"
+            },
+            {
+              "name": "sec-fetch-site",
+              "value": "same-origin"
+            },
+            {
+              "name": "sec-fetch-user",
+              "value": "?1"
+            },
+            {
+              "name": "upgrade-insecure-requests",
+              "value": "1"
+            },
+            {
+              "name": "user-agent",
+              "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+            },
+            {
+              "name": "viewport-width",
+              "value": "814"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        800,
+        160
+      ],
+      "id": "01be2d06-173b-4bc3-b57b-6f8ae09caefe",
+      "name": "HTTP Request2",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "scripts",
+              "cssSelector": "script[type=\"application/json\"]",
+              "returnValue": "html",
+              "returnArray": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        1024,
+        144
+      ],
+      "id": "f2a277cc-a362-4091-a728-fc96fcb5a3dd",
+      "name": "HTML1"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "scripts",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1248,
+        704
+      ],
+      "id": "178b43d3-96d7-4cdd-b357-466c21254adb",
+      "name": "Split Out1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -176,
+        960
+      ],
+      "id": "673f9c5f-e1f9-4487-a41a-4ef1726af975",
+      "name": "Loop Over Items1",
+      "executeOnce": false,
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a5a37d90-a3e3-4b1c-8a41-a8d559c4c9b6",
+              "leftValue": "={{ $json.scripts }}",
+              "rightValue": "={{ $('Telegram Trigger').item.json.message.text.split(\"/\")[4] }}",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        64,
+        1072
+      ],
+      "id": "77e7d8cc-45ab-4740-9d6c-c2dcca38f887",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw     = $input.first().json.scripts;\nconst scripts = typeof raw === 'string' ? JSON.parse(raw) : raw;\nconst url =\n  scripts?.require?.[0]?.[3]?.[0]?.__bbox?.require?.[0]?.[3]?.[1]\n         ?.__bbox?.result?.data\n         ?.xdt_api__v1__media__shortcode__web_info?.items?.[0]\n         ?.video_versions?.[0]?.url ?? null;\n\nreturn [\n  {\n    json: { url }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        288,
+        1040
+      ],
+      "id": "2a965497-ccac-4888-a399-b083c1ed5310",
+      "name": "Code1",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        688,
+        1008
+      ],
+      "id": "a49fca2b-7749-4e47-8339-5870843dbaf4",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0e2f2f92-002a-4a01-9ad9-e6020674e315",
+              "leftValue": "={{ $json.url }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        448,
+        1152
+      ],
+      "id": "26959787-438e-4fbb-9b41-c32caf3b4c2b",
+      "name": "If4"
+    },
+    {
+      "parameters": {
+        "operation": "sendVideo",
+        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "binaryData": true,
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        848,
+        1008
+      ],
+      "id": "6af40513-19fb-4c80-af76-941bb7f68330",
+      "name": "Send a video1",
+      "webhookId": "ee4fb4cf-c03d-44d4-adac-278674a6c941",
+      "executeOnce": true,
+      "credentials": {
+        "telegramApi": {
+          "id": "Y74ZZSS8o89BKZA4",
+          "name": "Arya 3"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Send a video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "HTML1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML1": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "If4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "Send a video1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If4": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "0f697a5a-8123-49d4-8d70-9ed89c7e7177",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fcd4667358b944199263e425bf5854ca490d4dd43ed166e6d276f3c66e35f29f"
+  },
+  "id": "o9UGN6UnrwmRlZSv",
+  "tags": []
+}
